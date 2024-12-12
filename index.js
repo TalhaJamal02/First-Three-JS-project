@@ -27,20 +27,30 @@ controls.enableDamping = true;  // Optional: Smooth out the movement
 controls.dampingFactor = 0.25;  // Speed of the camera rotation damping
 controls.screenSpacePanning = false;  // Disable panning outside of the scene
 
+// Create a grid with more divisions (e.g., 50 divisions)
+const gridHelper = new THREE.GridHelper(40, 100);
+scene.add(gridHelper);
+
+// Customizing grid colors by accessing the material
+gridHelper.material.linewidth = 2; // Increase line width (may not work in all browsers)
+
+// Set the main grid line color to white and subgrid line color to light grey
+gridHelper.material.color.set(0xffffff);  // Main grid lines (white)
+
+// Customizing the subgrid lines (minor grid lines)
+const subGridMaterial = gridHelper.material.clone();
+subGridMaterial.color.set(0xffffff);  // Subgrid lines (light grey)
+gridHelper.material = subGridMaterial;
 
 // Raycasting for cursor detection
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
-let isHovering = false;
 
 // Event listener for mouse move
 window.addEventListener('mousemove', (event) => {
   // Calculate mouse position in normalized device coordinates (-1 to +1) for both components
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-  // Update the raycaster with the camera and mouse position
-  raycaster.update();
 });
 
 function animate() {
@@ -54,11 +64,7 @@ function animate() {
   const intersects = raycaster.intersectObject(cube);
 
   // Change the cursor when hovering over the cube
-  if (intersects.length > 0) {
-    document.body.style.cursor = 'pointer'; // Change cursor to pointer
-  } else {
-    document.body.style.cursor = 'auto'; // Default cursor
-  }
+  document.body.style.cursor = intersects.length > 0 ? 'pointer' : 'auto';
 
   // Optionally, rotate the cube itself
   cube.rotation.x += 0.01;
